@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
+	"time"
 )
 
 func init() {
@@ -19,9 +20,9 @@ func main() {
 	fmt.Println(os.Getenv("API_KEY"))
 
 	apiClient := interfaces.NewApiClient(os.Getenv("API_KEY"), os.Getenv("API_SECRET"))
-	balance, err := apiClient.GetBalance()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(balance)
+	ticker, _ := apiClient.GetTicker("BTC_JPY")
+	fmt.Println(ticker)
+	fmt.Println(ticker.GetMidPrice())
+	fmt.Println(ticker.DateTime())
+	fmt.Println(ticker.TruncateDateTime(time.Hour))
 }

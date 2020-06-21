@@ -101,3 +101,41 @@ func (a *apiClient) GetBalance() ([]domain.Balance, error) {
 	}
 	return balance, nil
 }
+
+func (a *apiClient) GetTicker(productCode string) (*domain.Ticker, error) {
+	url := "ticker"
+	resp, err := a.DoRequest("GET", url, map[string]string{"product_code": productCode}, nil)
+	if err != nil {
+		logger.Error("GetTicker() is error", err)
+		return nil, err
+	}
+	fmt.Println(string(resp))
+	logger.Info("GetTicker()", fmt.Sprintf("url:%s", url), fmt.Sprintf("resp:%s", resp))
+	var ticker domain.Ticker
+	err = json.Unmarshal(resp, &ticker)
+	if err != nil {
+		logger.Error("json unmarshal is failed", err)
+		return nil, err
+	}
+	return &ticker, nil
+}
+
+type JsonRPC2 struct {
+	Version string      `json:"version"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params"`
+	Result  interface{} `json:"result,omitempty"`
+	Id      *int        `json:"id,omitempty"`
+}
+
+type SubscribeParams struct {
+	Channel string `json:"channel"`
+}
+
+func (a *apiClient) GetRealTimeTicker(symbol string, ch chan<- domain.Ticker) {
+	u := url.URL{
+		Scheme: "wss",
+		Host:   "ws.lightstream.bitflyer.com",
+		Path:   "/json-rc",
+	}
+}
