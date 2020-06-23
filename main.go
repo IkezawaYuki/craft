@@ -1,6 +1,7 @@
 package main
 
 import (
+	"IkezawaYuki/craft/domain"
 	interfaces "IkezawaYuki/craft/interfaces/bitflyer"
 	"IkezawaYuki/craft/logger"
 	"fmt"
@@ -25,4 +26,13 @@ func main() {
 	fmt.Println(ticker.GetMidPrice())
 	fmt.Println(ticker.DateTime())
 	fmt.Println(ticker.TruncateDateTime(time.Hour))
+
+	tickerChannel := make(chan domain.Ticker)
+	go apiClient.GetRealTimeTicker(os.Getenv("PRODUCT_CODE"), tickerChannel)
+	for ticker := range tickerChannel {
+		fmt.Println(ticker)
+		fmt.Println(ticker.GetMidPrice())
+		fmt.Println(ticker.DateTime())
+		fmt.Println(ticker.TruncateDateTime(time.Second))
+	}
 }

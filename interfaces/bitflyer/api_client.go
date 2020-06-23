@@ -10,7 +10,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -136,6 +138,49 @@ func (a *apiClient) GetRealTimeTicker(symbol string, ch chan<- domain.Ticker) {
 	u := url.URL{
 		Scheme: "wss",
 		Host:   "ws.lightstream.bitflyer.com",
-		Path:   "/json-rc",
+		Path:   "/json-rpc",
+	}
+	log.Printf("connecting to %s", u.String())
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		log.Fatal("dial:", err)
+	}
+
+	channel := fmt.Sprintf("lightning_ticker_%s", symbol)
+	if err := c.WriteJSON(&JsonRPC2{
+		Version: "2.0",
+		Method:  "subscribe",
+		Params:  &SubscribeParams{channel},
+	}); err != nil {
+		log.Fatal("subscribe:", err)
+	}
+
+OUTER:
+	for {
+		message := new(JsonRPC2)
+		if err := c.ReadJSON(message); err != nil {
+			log.Println("read:", err)
+			return
+		}
+
+		if message.Method == "channelMessage" {
+			switch v := message.Params.(type) {
+			case map[string]interface{}:
+				for key, binary := range v {
+					if key == "message" {
+						marshalTic, err := json.Marshal(binary)
+						if err != nil {
+							continue OUTER
+						}
+						var ticker domain.Ticker
+						if err := json.Unmarshal(marshalTic, &ticker); err != nil {
+							continue OUTER
+						}
+						ch <- ticker
+					}
+				}
+			}
+		}
 	}
 }
