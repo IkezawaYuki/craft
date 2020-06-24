@@ -1,4 +1,4 @@
-package domain
+package model
 
 type Balance struct {
 	CurrencyCode string  `json:"currency_code"`

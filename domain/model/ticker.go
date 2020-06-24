@@ -1,4 +1,4 @@
-package domain
+package model
 
 import (
 	"IkezawaYuki/craft/logger"

@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"IkezawaYuki/craft/domain"
+	"IkezawaYuki/craft/domain/model"
 	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer"
 	"IkezawaYuki/craft/logger"
 	"bytes"
@@ -86,7 +86,7 @@ func (a *apiClient) DoRequest(method string, urlPath string, query map[string]st
 	return body, nil
 }
 
-func (a *apiClient) GetBalance() ([]domain.Balance, error) {
+func (a *apiClient) GetBalance() ([]model.Balance, error) {
 	url := "me/getbalance"
 	resp, err := a.DoRequest("GET", url, map[string]string{}, nil)
 	if err != nil {
@@ -95,7 +95,7 @@ func (a *apiClient) GetBalance() ([]domain.Balance, error) {
 	}
 	fmt.Println(string(resp))
 	logger.Info("getBalance()", fmt.Sprintf("url:%s", url), fmt.Sprintf("resp:%s", resp))
-	var balance []domain.Balance
+	var balance []model.Balance
 	err = json.Unmarshal(resp, &balance)
 	if err != nil {
 		logger.Error("json unmarshal is failed", err)
@@ -104,7 +104,7 @@ func (a *apiClient) GetBalance() ([]domain.Balance, error) {
 	return balance, nil
 }
 
-func (a *apiClient) GetTicker(productCode string) (*domain.Ticker, error) {
+func (a *apiClient) GetTicker(productCode string) (*model.Ticker, error) {
 	url := "ticker"
 	resp, err := a.DoRequest("GET", url, map[string]string{"product_code": productCode}, nil)
 	if err != nil {
@@ -113,7 +113,7 @@ func (a *apiClient) GetTicker(productCode string) (*domain.Ticker, error) {
 	}
 	fmt.Println(string(resp))
 	logger.Info("GetTicker()", fmt.Sprintf("url:%s", url), fmt.Sprintf("resp:%s", resp))
-	var ticker domain.Ticker
+	var ticker model.Ticker
 	err = json.Unmarshal(resp, &ticker)
 	if err != nil {
 		logger.Error("json unmarshal is failed", err)
@@ -134,7 +134,7 @@ type SubscribeParams struct {
 	Channel string `json:"channel"`
 }
 
-func (a *apiClient) GetRealTimeTicker(symbol string, ch chan<- domain.Ticker) {
+func (a *apiClient) GetRealTimeTicker(symbol string, ch chan<- model.Ticker) {
 	u := url.URL{
 		Scheme: "wss",
 		Host:   "ws.lightstream.bitflyer.com",
@@ -173,7 +173,7 @@ OUTER:
 						if err != nil {
 							continue OUTER
 						}
-						var ticker domain.Ticker
+						var ticker model.Ticker
 						if err := json.Unmarshal(marshalTic, &ticker); err != nil {
 							continue OUTER
 						}
@@ -183,4 +183,35 @@ OUTER:
 			}
 		}
 	}
+}
+
+func (a *apiClient) SendOrder(order *model.Order) (*model.ResponseSendChildOrder, error) {
+	data, err := json.Marshal(order)
+	if err != nil {
+		return nil, err
+	}
+	u := "me/sendchildorder"
+	resp, err := a.DoRequest("POST", u, map[string]string{}, data)
+	if err != nil {
+		return nil, err
+	}
+	var response model.ResponseSendChildOrder
+	err = json.Unmarshal(resp, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (a *apiClient) ListOrder(query map[string]string) ([]model.Order, error) {
+	resp, err := a.DoRequest(http.MethodGet, "me/getchildorders", query, nil)
+	if err != nil {
+		return nil, err
+	}
+	var responseListOrder []model.Order
+	err = json.Unmarshal(resp, &responseListOrder)
+	if err != nil {
+		return nil, err
+	}
+	return responseListOrder, nil
 }

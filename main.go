@@ -1,7 +1,7 @@
 package main
 
 import (
-	"IkezawaYuki/craft/domain"
+	"IkezawaYuki/craft/domain/model"
 	interfaces "IkezawaYuki/craft/interfaces/bitflyer"
 	"IkezawaYuki/craft/logger"
 	"fmt"
@@ -21,18 +21,13 @@ func main() {
 	fmt.Println(os.Getenv("API_KEY"))
 
 	apiClient := interfaces.NewApiClient(os.Getenv("API_KEY"), os.Getenv("API_SECRET"))
-	ticker, _ := apiClient.GetTicker("BTC_JPY")
-	fmt.Println(ticker)
-	fmt.Println(ticker.GetMidPrice())
-	fmt.Println(ticker.DateTime())
-	fmt.Println(ticker.TruncateDateTime(time.Hour))
 
-	tickerChannel := make(chan domain.Ticker)
-	go apiClient.GetRealTimeTicker(os.Getenv("PRODUCT_CODE"), tickerChannel)
-	for ticker := range tickerChannel {
-		fmt.Println(ticker)
-		fmt.Println(ticker.GetMidPrice())
-		fmt.Println(ticker.DateTime())
-		fmt.Println(ticker.TruncateDateTime(time.Second))
+	order := &model.Order{
+		ProductCode:     os.Getenv("PRODUCT_CODE"),
+		ChildOrderType:  "MARKET",
+		Side:            "BUY",
+		Size:            0.001,
+		MinuteToExpires: 1,
+		TimeInForce:     "GTC",
 	}
 }
