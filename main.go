@@ -1,7 +1,6 @@
 package main
 
 import (
-	"IkezawaYuki/craft/domain/model"
 	interfaces "IkezawaYuki/craft/interfaces/bitflyer"
 	"IkezawaYuki/craft/logger"
 	"fmt"
@@ -16,18 +15,25 @@ func init() {
 	}
 }
 
+type ConfigList struct {
+	APIKey      string
+	APISecret   string
+	LogFile     string
+	ProductCode string
+
+	TradeDuration time.Duration
+	Durations     map[string]time.Duration
+	DbName        string
+	SQLDriver     string
+	Port          int
+}
+
 func main() {
 	logger.SettingInit(os.Getenv("LOG_FILE"))
 	fmt.Println(os.Getenv("API_KEY"))
 
 	apiClient := interfaces.NewApiClient(os.Getenv("API_KEY"), os.Getenv("API_SECRET"))
 
-	order := &model.Order{
-		ProductCode:     os.Getenv("PRODUCT_CODE"),
-		ChildOrderType:  "MARKET",
-		Side:            "BUY",
-		Size:            0.001,
-		MinuteToExpires: 1,
-		TimeInForce:     "GTC",
-	}
+	fmt.Println(apiClient)
+
 }
