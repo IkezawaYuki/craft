@@ -7,7 +7,6 @@ import (
 	"IkezawaYuki/craft/logger"
 	"fmt"
 	"github.com/joho/godotenv"
-	"os"
 )
 
 func init() {
@@ -17,14 +16,16 @@ func init() {
 }
 
 func main() {
-	logger.SettingInit(os.Getenv("LOG_FILE"))
-	fmt.Println(os.Getenv("API_KEY"))
 
-	apiClient := interfaces.NewApiClient(os.Getenv("API_KEY"), os.Getenv("API_SECRET"))
+	// 設定ファイルの読み込み
+	config.Init()
+
+	// ログの設定
+	logger.SettingInit(config.ConfigList.LogFile)
+
+	apiClient := interfaces.NewApiClient(config.ConfigList.APIKey, config.ConfigList.APISecret)
 
 	fmt.Println(apiClient)
-
-	config.Init()
 
 	conn := infrastructure.Connect()
 	fmt.Println(conn)
