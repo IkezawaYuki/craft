@@ -1,6 +1,8 @@
 package main
 
 import (
+	"IkezawaYuki/craft/config"
+	infrastructure "IkezawaYuki/craft/infrastructure/datastore"
 	interfaces "IkezawaYuki/craft/interfaces/bitflyer"
 	"IkezawaYuki/craft/logger"
 	"fmt"
@@ -22,4 +24,8 @@ func main() {
 
 	fmt.Println(apiClient)
 
+	config.Init()
+
+	conn := infrastructure.Connect()
+	fmt.Println(conn)
 }

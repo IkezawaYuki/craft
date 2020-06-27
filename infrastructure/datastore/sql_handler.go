@@ -1,10 +1,11 @@
-package datastore
+package infrastructure
 
 import (
 	"IkezawaYuki/craft/config"
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"time"
 )
 
 var db *sql.DB
@@ -13,6 +14,10 @@ const (
 	tableNameSignalEvents = "signal_events"
 )
 
+func GetCandleTableName(productCode string, duration time.Duration) string {
+	return fmt.Sprintf("%s_%s", productCode, duration)
+}
+
 func Connect() *sql.DB {
 	var err error
 	db, err = sql.Open(config.ConfigList.SQLDriver, config.ConfigList.DbName)
@@ -20,9 +25,32 @@ func Connect() *sql.DB {
 		panic(err)
 	}
 	cmd := fmt.Sprintf(`
-		CREATE TABLE IF NOT
-	`)
-	db.Exec(cmd)
+		CREATE TABLE IF NOT EXISTS %s (
+			time DATETIME PRIMARY KEY NOT NULL,
+			product_code STRING,
+			side STRING,
+			price FLOAT,
+			size FLOAT)`, tableNameSignalEvents)
+	_, err = db.Exec(cmd)
+	if err != nil {
+		panic(err)
+	}
 
+	for _, duration := range config.ConfigList.Durations {
+		tableName := GetCandleTableName(config.ConfigList.ProductCode, duration)
+		fmt.Println(tableName)
+		c := fmt.Sprintf(`
+			CREATE TABLE IF NOT EXISTS %s (
+				time DATETIME PRIMARY KEY NULL,
+				open FLOAT,
+				close FLOAT,
+				high FLOAT,
+				low FLOAT,
+				volume FLOAT)`, tableName)
+		_, err = db.Exec(c)
+		if err != nil {
+			panic(err)
+		}
+	}
 	return db
 }
