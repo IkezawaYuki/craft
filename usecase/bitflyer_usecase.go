@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	"IkezawaYuki/craft/config"
 	"IkezawaYuki/craft/domain/entity"
 	"IkezawaYuki/craft/domain/model"
 	"IkezawaYuki/craft/domain/repository"
+	"IkezawaYuki/craft/logger"
+	"fmt"
 	"time"
 )
 
@@ -17,6 +20,7 @@ func NewBitFlyerUsecase(canRepo repository.CandleRepository) BitFlyerUsecase {
 
 type BitFlyerUsecase interface {
 	CreateCandleWithDuration(model.Ticker, string, time.Duration) bool
+	FindAllCandle(string, time.Duration, int) *model.DataFrameCandle
 }
 
 func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productCode string, duration time.Duration) bool {
@@ -46,4 +50,14 @@ func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productC
 		panic(err)
 	}
 	return true
+}
+
+func (u *bitflyerUsecase) FindAllCandle(productCode string, durationTime time.Duration, limit int) *model.DataFrameCandle {
+	df, err := u.candleRepo.FindAllCandle(productCode, durationTime, limit)
+	if err != nil {
+		logger.Error(fmt.Sprintf("FindAllCandle(%v, %v, %d)",
+			config.ConfigList.ProductCode, durationTime, limit), err)
+		return nil
+	}
+	return df
 }

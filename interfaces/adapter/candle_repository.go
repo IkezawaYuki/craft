@@ -58,13 +58,13 @@ const findAllStmt = `SELECT * FROM (
 	SELECT time, open, close, high, low, volume FROM %s ORDER BY time DESC LIMIT ?
 	) ORDER BY time ASC`
 
-func (c *candleRepository) FindAllCandle(productCode string, duration time.Duration, limit int) *model.DataFrameCandle {
+func (c *candleRepository) FindAllCandle(productCode string, duration time.Duration, limit int) (*model.DataFrameCandle, error) {
 	tableName := entity.GetCandleTableName(productCode, duration)
 	stmt := fmt.Sprintf(findAllStmt, tableName)
 	rows, err := c.conn.Query(stmt, limit)
 	if err != nil {
 		logger.Error("FindAllCandle Query()", err)
-		return nil
+		return nil, err
 	}
 	var dfCandle model.DataFrameCandle
 	dfCandle.ProductCode = productCode
@@ -73,9 +73,9 @@ func (c *candleRepository) FindAllCandle(productCode string, duration time.Durat
 		var candle entity.Candle
 		if err := rows.Scan(&candle.Time, &candle.Open, &candle.High, &candle.Low, &candle.Volume); err != nil {
 			logger.Error("FindAllCandle rows.Scan()", err)
-			return nil
+			return nil, err
 		}
 		dfCandle.Candles = append(dfCandle.Candles, candle)
 	}
-	return &dfCandle
+	return &dfCandle, nil
 }

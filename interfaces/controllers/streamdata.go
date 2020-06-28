@@ -10,6 +10,8 @@ import (
 	"IkezawaYuki/craft/usecase"
 	"database/sql"
 	"fmt"
+	"net/http"
+	"strconv"
 )
 
 type BitlyerController interface {
@@ -43,4 +45,25 @@ func (c *bitflyerController) StreamIngestionData() {
 			}
 		}
 	}
+}
+
+func (c *bitflyerController) ApiCandleHandler(w http.ResponseWriter, r *http.Request) {
+	productCode := r.URL.Query().Get("product_code")
+	if productCode == "" {
+		// todo error
+		return
+	}
+	strLimit := r.URL.Query().Get("limit")
+	limit, err := strconv.Atoi(strLimit)
+	if strLimit == "" || err != nil || limit < 0 || limit > 1000 {
+		limit = 1000
+	}
+
+	duration := r.URL.Query().Get("duration")
+	if duration == "" {
+		duration = "1m"
+	}
+	durationTime := config.ConfigList.Durations[duration]
+
+	df := c.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
 }
