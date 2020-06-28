@@ -1,4 +1,4 @@
-package interfaces
+package bitflyer
 
 import (
 	"IkezawaYuki/craft/domain/model"

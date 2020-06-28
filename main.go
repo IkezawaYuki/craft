@@ -3,9 +3,8 @@ package main
 import (
 	"IkezawaYuki/craft/config"
 	infrastructure "IkezawaYuki/craft/infrastructure/datastore"
-	interfaces "IkezawaYuki/craft/interfaces/bitflyer"
+	"IkezawaYuki/craft/interfaces/controllers"
 	"IkezawaYuki/craft/logger"
-	"fmt"
 	"github.com/joho/godotenv"
 )
 
@@ -23,10 +22,9 @@ func main() {
 	// ログの設定
 	logger.SettingInit(config.ConfigList.LogFile)
 
-	apiClient := interfaces.NewApiClient(config.ConfigList.APIKey, config.ConfigList.APISecret)
-
-	fmt.Println(apiClient)
-
+	// DBの接続
 	conn := infrastructure.Connect()
-	fmt.Println(conn)
+
+	ctr := controllers.NewBitlyerController(conn)
+	ctr.StreamIngestionData()
 }
