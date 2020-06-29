@@ -9,6 +9,7 @@ import (
 	"IkezawaYuki/craft/logger"
 	"IkezawaYuki/craft/usecase"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -66,4 +67,12 @@ func (c *bitflyerController) ApiCandleHandler(w http.ResponseWriter, r *http.Req
 	durationTime := config.ConfigList.Durations[duration]
 
 	df := c.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+
+	byte, err := json.Marshal(df)
+	if err != nil {
+		// todo error
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(byte)
 }
