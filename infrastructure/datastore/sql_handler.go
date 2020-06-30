@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"IkezawaYuki/craft/config"
+	"IkezawaYuki/craft/interfaces"
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,6 +17,14 @@ const (
 
 func GetCandleTableName(productCode string, duration time.Duration) string {
 	return fmt.Sprintf("%s_%s", productCode, duration)
+}
+
+type sqlHandler struct {
+	Conn *sql.DB
+}
+
+func NewSQLHandler() interfaces.SQLHandler {
+	return sqlHandler{Conn: Connect()}
 }
 
 func Connect() *sql.DB {
@@ -53,4 +62,16 @@ func Connect() *sql.DB {
 		}
 	}
 	return db
+}
+
+type SqlResult struct {
+	Result *sql.Result
+}
+
+type SqlRows struct {
+	Rows *sql.Rows
+}
+
+type SqlRow struct {
+	Row *sql.Row
 }
