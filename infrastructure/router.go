@@ -3,6 +3,7 @@ package infrastructure
 import (
 	infrastructure "IkezawaYuki/craft/infrastructure/datastore"
 	"IkezawaYuki/craft/interfaces/controllers"
+	"github.com/gin-gonic/gin"
 )
 
 var Router *gin.Engine
@@ -12,7 +13,7 @@ func init() {
 
 	bitflyerCtr := controllers.NewBitlyerController(infrastructure.Connect())
 
-	router.POST("/users", func(c *gin.Context) { bitflyerCtr.StreamIngestionData() })
+	router.POST("/api/candle/", func(c *gin.Context) { bitflyerCtr.StreamIngestionData() })
 
 	Router = router
 }
