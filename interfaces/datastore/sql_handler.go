@@ -1,4 +1,4 @@
-package interfaces
+package datastore
 
 type SQLHandler interface {
 }

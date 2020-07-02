@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"IkezawaYuki/craft/config"
-	"IkezawaYuki/craft/interfaces"
+	"IkezawaYuki/craft/interfaces/datastore"
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -23,7 +23,7 @@ type sqlHandler struct {
 	Conn *sql.DB
 }
 
-func NewSQLHandler() interfaces.SQLHandler {
+func NewSQLHandler() datastore.SQLHandler {
 	return sqlHandler{Conn: Connect()}
 }
 
