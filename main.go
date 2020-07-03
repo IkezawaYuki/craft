@@ -22,9 +22,6 @@ func main() {
 	// ログの設定
 	logger.SettingInit(config.ConfigList.LogFile)
 
-	// DBの接続
-	conn := infrastructure.Connect()
-
-	ctr := controllers.NewBitlyerController(conn)
+	ctr := controllers.NewBitlyerController(infrastructure.Connect())
 	ctr.StreamIngestionData()
 }

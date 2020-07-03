@@ -19,12 +19,12 @@ func GetCandleTableName(productCode string, duration time.Duration) string {
 	return fmt.Sprintf("%s_%s", productCode, duration)
 }
 
-type sqlHandler struct {
+type sqliteHandler struct {
 	Conn *sql.DB
 }
 
-func NewSQLHandler() datastore.SQLHandler {
-	return sqlHandler{Conn: Connect()}
+func NewSQLiteHandler() datastore.SQLHandler {
+	return sqliteHandler{Conn: Connect()}
 }
 
 func Connect() *sql.DB {
