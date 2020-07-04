@@ -6,9 +6,9 @@ import (
 	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer"
 	"IkezawaYuki/craft/interfaces/adapter"
 	"IkezawaYuki/craft/interfaces/bitflyer"
+	"IkezawaYuki/craft/interfaces/datastore"
 	"IkezawaYuki/craft/logger"
 	"IkezawaYuki/craft/usecase"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,8 +24,8 @@ type bitflyerController struct {
 	bitlyerUsecase usecase.BitFlyerUsecase
 }
 
-func NewBitlyerController(db *sql.DB) BitlyerController {
-	bitRepo := adapter.NewCandleRepository(db)
+func NewBitlyerController(sqlH datastore.SQLHandler) BitlyerController {
+	bitRepo := adapter.NewCandleRepository(sqlH)
 	apiClient := bitflyer.NewApiClient(config.ConfigList.APIKey, config.ConfigList.APISecret)
 	bitUsecase := usecase.NewBitFlyerUsecase(bitRepo)
 	return &bitflyerController{

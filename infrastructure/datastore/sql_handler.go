@@ -20,11 +20,11 @@ func GetCandleTableName(productCode string, duration time.Duration) string {
 }
 
 type sqliteHandler struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
-func NewSQLiteHandler() datastore.SQLHandler {
-	return sqliteHandler{Conn: Connect()}
+func NewSQLiteHandler(db *sql.DB) datastore.SQLHandler {
+	return &sqliteHandler{conn: db}
 }
 
 func Connect() *sql.DB {
@@ -64,14 +64,39 @@ func Connect() *sql.DB {
 	return db
 }
 
-type SqlResult struct {
-	Result *sql.Result
+func (h *sqliteHandler) Exec(query string, args ...interface{}) (datastore.Result, error) {
+	result, err := h.conn.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	resultWrap := new(sqlResult)
+	resultWrap.result = result
+	return resultWrap, nil
 }
 
-type SqlRows struct {
-	Rows *sql.Rows
+func (h *sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows, error) {
+	rows, err := h.conn.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	rowsWrap := new(sqlRows)
+	rowsWrap.rows = rows
+	return rowsWrap, nil
 }
 
-type SqlRow struct {
-	Row *sql.Row
+func (h *sqliteHandler) QueryRow(query string, args ...interface{}) datastore.Row {
+	row := h.conn.QueryRow(query, args...)
+	rowWrap := new(sqlRow)
+	rowWrap.row = row
+	return rowWrap
+}
+
+func (h *sqliteHandler) Begin() (datastore.Tx, error) {
+	tx, err := h.conn.Begin()
+	if err != nil {
+		return nil, err
+	}
+	txWrap := new(sqlTx)
+	txWrap.tx = tx
+	return txWrap, nil
 }

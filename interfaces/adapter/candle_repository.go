@@ -4,25 +4,25 @@ import (
 	"IkezawaYuki/craft/domain/entity"
 	"IkezawaYuki/craft/domain/model"
 	"IkezawaYuki/craft/domain/repository"
+	"IkezawaYuki/craft/interfaces/datastore"
 	"IkezawaYuki/craft/logger"
-	"database/sql"
 	"fmt"
 	"time"
 )
 
 type candleRepository struct {
-	conn *sql.DB
+	sqlHandler datastore.SQLHandler
 }
 
-func NewCandleRepository(conn *sql.DB) repository.CandleRepository {
-	return &candleRepository{conn: conn}
+func NewCandleRepository(sqlH datastore.SQLHandler) repository.CandleRepository {
+	return &candleRepository{sqlHandler: sqlH}
 }
 
 const createStmt = `INSERT INTO %s (time, open, close, high, low, volume) VALUES (?, ?, ?, ?, ?, ?)`
 
 func (c *candleRepository) Create(candle *entity.Candle) error {
 	stmt := fmt.Sprintf(createStmt, entity.GetCandleTableName(candle.ProductCode, candle.Duration))
-	_, err := c.conn.Exec(stmt, candle.Time, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
+	_, err := c.sqlHandler.Exec(stmt, candle.Time, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ const updateStmt = `UPDATE %s SET open = ?, close = ?, high = ?, low = ?, volume
 
 func (c *candleRepository) Update(candle *entity.Candle) error {
 	stmt := fmt.Sprintf(updateStmt, entity.GetCandleTableName(candle.ProductCode, candle.Duration))
-	_, err := c.conn.Exec(stmt, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume, candle.Time)
+	_, err := c.sqlHandler.Exec(stmt, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume, candle.Time)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ const selectStmt = `SELECT time, open, close, high, low, volume FROM %s WHERE ti
 func (c *candleRepository) FindByTime(productCode string, duration time.Duration, time time.Time) *entity.Candle {
 	tableName := entity.GetCandleTableName(productCode, duration)
 	stmt := fmt.Sprintf(selectStmt, tableName)
-	row := c.conn.QueryRow(stmt, time)
+	row := c.sqlHandler.QueryRow(stmt, time)
 	var candle entity.Candle
 	if err := row.Scan(&candle.Time, &candle.Open, &candle.Close, &candle.High, &candle.Low, &candle.Volume); err != nil {
 		logger.Error("FindByTime", err)
@@ -61,7 +61,7 @@ const findAllStmt = `SELECT * FROM (
 func (c *candleRepository) FindAllCandle(productCode string, duration time.Duration, limit int) (*model.DataFrameCandle, error) {
 	tableName := entity.GetCandleTableName(productCode, duration)
 	stmt := fmt.Sprintf(findAllStmt, tableName)
-	rows, err := c.conn.Query(stmt, limit)
+	rows, err := c.sqlHandler.Query(stmt, limit)
 	if err != nil {
 		logger.Error("FindAllCandle Query()", err)
 		return nil, err

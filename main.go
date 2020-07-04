@@ -22,6 +22,8 @@ func main() {
 	// ログの設定
 	logger.SettingInit(config.ConfigList.LogFile)
 
-	ctr := controllers.NewBitlyerController(infrastructure.Connect())
+	handler := infrastructure.NewSQLiteHandler(infrastructure.Connect())
+
+	ctr := controllers.NewBitlyerController()
 	ctr.StreamIngestionData()
 }
