@@ -1,4 +1,4 @@
-package infrastructure
+package bitflyerclient
 
 import (
 	"IkezawaYuki/craft/domain/model"

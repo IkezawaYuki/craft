@@ -2,7 +2,7 @@ package bitflyer
 
 import (
 	"IkezawaYuki/craft/domain/model"
-	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer"
+	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer_client"
 	"IkezawaYuki/craft/logger"
 	"bytes"
 	"crypto/hmac"

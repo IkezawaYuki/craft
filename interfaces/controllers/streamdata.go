@@ -3,20 +3,19 @@ package controllers
 import (
 	"IkezawaYuki/craft/config"
 	"IkezawaYuki/craft/domain/model"
-	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer"
+	infrastructure "IkezawaYuki/craft/infrastructure/bitflyer_client"
 	"IkezawaYuki/craft/interfaces/adapter"
 	"IkezawaYuki/craft/interfaces/bitflyer"
 	"IkezawaYuki/craft/interfaces/datastore"
 	"IkezawaYuki/craft/logger"
 	"IkezawaYuki/craft/usecase"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
 )
 
 type BitlyerController interface {
-	StreamIngestionData()
+	StreamIngestionData(c Context)
+	ApiCandleHandler(c Context)
 }
 
 type bitflyerController struct {
@@ -34,13 +33,13 @@ func NewBitlyerController(sqlH datastore.SQLHandler) BitlyerController {
 	}
 }
 
-func (c *bitflyerController) StreamIngestionData() {
+func (b *bitflyerController) StreamIngestionData(c Context) {
 	var tickerChannel = make(chan model.Ticker)
-	go c.bitflyerClient.GetRealTimeTicker(config.ConfigList.ProductCode, tickerChannel)
+	go b.bitflyerClient.GetRealTimeTicker(config.ConfigList.ProductCode, tickerChannel)
 	for ticker := range tickerChannel {
 		logger.Info("StreamIngestionData", fmt.Sprintf("ticker: %v", ticker))
 		for _, duration := range config.ConfigList.Durations {
-			isCreated := c.bitlyerUsecase.CreateCandleWithDuration(ticker, ticker.ProductCode, duration)
+			isCreated := b.bitlyerUsecase.CreateCandleWithDuration(ticker, ticker.ProductCode, duration)
 			if isCreated && duration == config.ConfigList.TradeDuration {
 				// todo
 			}
@@ -48,31 +47,36 @@ func (c *bitflyerController) StreamIngestionData() {
 	}
 }
 
-func (c *bitflyerController) ApiCandleHandler(w http.ResponseWriter, r *http.Request) {
-	productCode := r.URL.Query().Get("product_code")
+func (b *bitflyerController) ApiCandleHandler(c Context) {
+	//productCode := r.URL.Query().Get("product_code")
+	productCode := c.Query("product_code")
+
 	if productCode == "" {
 		// todo error
 		return
 	}
-	strLimit := r.URL.Query().Get("limit")
+	//strLimit := r.URL.Query().Get("limit")
+	strLimit := c.Query("limit")
 	limit, err := strconv.Atoi(strLimit)
 	if strLimit == "" || err != nil || limit < 0 || limit > 1000 {
 		limit = 1000
 	}
 
-	duration := r.URL.Query().Get("duration")
+	//duration := r.URL.Query().Get("duration")
+	duration := c.Query("duration")
 	if duration == "" {
 		duration = "1m"
 	}
 	durationTime := config.ConfigList.Durations[duration]
 
-	df := c.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+	df := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
 
-	byte, err := json.Marshal(df)
-	if err != nil {
-		// todo error
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(byte)
+	//byte, err := json.Marshal(df)
+	//if err != nil {
+	//	// todo error
+	//	return
+	//}
+	//w.Header().Set("Content-Type", "application/json")
+	//w.Write(byte)
+	c.JSON(200, df)
 }

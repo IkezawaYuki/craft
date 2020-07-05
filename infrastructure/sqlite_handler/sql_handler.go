@@ -1,8 +1,9 @@
-package infrastructure
+package sqlitehandler
 
 import (
 	"IkezawaYuki/craft/config"
 	"IkezawaYuki/craft/interfaces/datastore"
+	"IkezawaYuki/craft/logger"
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -61,20 +62,24 @@ func Connect() *sql.DB {
 			panic(err)
 		}
 	}
+	logger.Info("database is initialize")
 	return db
 }
 
-func (h *sqliteHandler) Exec(query string, args ...interface{}) (datastore.Result, error) {
+func (h sqliteHandler) Exec(query string, args ...interface{}) (datastore.Result, error) {
+	res := sqlResult{}
+	logger.Info("Exec method is invoked")
 	result, err := h.conn.Exec(query, args...)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 	resultWrap := new(sqlResult)
 	resultWrap.result = result
 	return resultWrap, nil
 }
 
-func (h *sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows, error) {
+func (h sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows, error) {
+	logger.Info("Query is invoked")
 	rows, err := h.conn.Query(query, args...)
 	if err != nil {
 		return nil, err
@@ -84,14 +89,15 @@ func (h *sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows
 	return rowsWrap, nil
 }
 
-func (h *sqliteHandler) QueryRow(query string, args ...interface{}) datastore.Row {
+func (h sqliteHandler) QueryRow(query string, args ...interface{}) datastore.Row {
+	logger.Info("QueryRow is invoked")
 	row := h.conn.QueryRow(query, args...)
 	rowWrap := new(sqlRow)
 	rowWrap.row = row
 	return rowWrap
 }
 
-func (h *sqliteHandler) Begin() (datastore.Tx, error) {
+func (h sqliteHandler) Begin() (datastore.Tx, error) {
 	tx, err := h.conn.Begin()
 	if err != nil {
 		return nil, err
