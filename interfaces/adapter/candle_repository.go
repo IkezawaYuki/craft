@@ -21,11 +21,9 @@ func NewCandleRepository(sqlH datastore.SQLHandler) repository.CandleRepository 
 const createStmt = `INSERT INTO %s (time, open, close, high, low, volume) VALUES (?, ?, ?, ?, ?, ?)`
 
 func (c *candleRepository) Create(candle *entity.Candle) error {
-	logger.Info("create method is invoked")
 	stmt := fmt.Sprintf(createStmt, entity.GetCandleTableName(candle.ProductCode, candle.Duration))
 	_, err := c.sqlHandler.Exec(stmt, candle.Time, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
 	if err != nil {
-		logger.Error("Exec method is error", err)
 		return err
 	}
 	return nil
@@ -50,7 +48,6 @@ func (c *candleRepository) FindByTime(productCode string, duration time.Duration
 	row := c.sqlHandler.QueryRow(stmt, time)
 	var candle entity.Candle
 	if err := row.Scan(&candle.Time, &candle.Open, &candle.Close, &candle.High, &candle.Low, &candle.Volume); err != nil {
-		logger.Error("FindByTime", err)
 		return nil
 	}
 	return &candle

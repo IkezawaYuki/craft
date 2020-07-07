@@ -38,6 +38,7 @@ func (b *bitflyerController) StreamIngestionData(c Context) {
 	go b.bitflyerClient.GetRealTimeTicker(config.ConfigList.ProductCode, tickerChannel)
 	for ticker := range tickerChannel {
 		logger.Info("StreamIngestionData", fmt.Sprintf("ticker: %v", ticker))
+		c.JSON(200, ticker)
 		for _, duration := range config.ConfigList.Durations {
 			isCreated := b.bitlyerUsecase.CreateCandleWithDuration(ticker, ticker.ProductCode, duration)
 			if isCreated && duration == config.ConfigList.TradeDuration {

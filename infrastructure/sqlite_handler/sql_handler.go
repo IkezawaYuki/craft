@@ -68,7 +68,6 @@ func Connect() *sql.DB {
 
 func (h sqliteHandler) Exec(query string, args ...interface{}) (datastore.Result, error) {
 	res := sqlResult{}
-	logger.Info("Exec method is invoked")
 	result, err := h.conn.Exec(query, args...)
 	if err != nil {
 		return res, err
@@ -79,7 +78,6 @@ func (h sqliteHandler) Exec(query string, args ...interface{}) (datastore.Result
 }
 
 func (h sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows, error) {
-	logger.Info("Query is invoked")
 	rows, err := h.conn.Query(query, args...)
 	if err != nil {
 		return nil, err
@@ -90,7 +88,6 @@ func (h sqliteHandler) Query(query string, args ...interface{}) (datastore.Rows,
 }
 
 func (h sqliteHandler) QueryRow(query string, args ...interface{}) datastore.Row {
-	logger.Info("QueryRow is invoked")
 	row := h.conn.QueryRow(query, args...)
 	rowWrap := new(sqlRow)
 	rowWrap.row = row

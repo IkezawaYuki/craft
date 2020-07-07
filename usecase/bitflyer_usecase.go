@@ -29,10 +29,7 @@ func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productC
 	if currentCandle == nil {
 		candle := entity.NewCandle(productCode, duration, ticker.TruncateDateTime(duration),
 			price, price, price, price, ticker.Volume)
-		err := u.candleRepo.Create(candle)
-		if err != nil {
-			panic(err)
-		}
+		_ = u.candleRepo.Create(candle)
 		return true
 	}
 
