@@ -18,8 +18,13 @@ func Init() {
 
 	bitflyerCtr := ctn.Resolve("bitflyer-controller").(controllers.BitlyerController)
 
+	router.LoadHTMLGlob("infrastructure/views/*.html")
+
 	router.POST("/api/candle/", func(c *gin.Context) {
 		bitflyerCtr.StreamIngestionData(c)
+	})
+	router.GET("/chart", func(c *gin.Context) {
+		bitflyerCtr.ViewChart(c)
 	})
 
 	Router = router

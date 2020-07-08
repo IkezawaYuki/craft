@@ -8,6 +8,7 @@ type Context interface {
 	JSON(code int, obj interface{})
 	Bind(interface{}) error
 	Status(int)
+	HTML(code int, name string, obj interface{})
 }
 
 var c gin.Context

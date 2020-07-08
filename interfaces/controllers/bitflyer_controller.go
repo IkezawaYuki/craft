@@ -10,12 +10,14 @@ import (
 	"IkezawaYuki/craft/logger"
 	"IkezawaYuki/craft/usecase"
 	"fmt"
+	"net/http"
 	"strconv"
 )
 
 type BitlyerController interface {
 	StreamIngestionData(c Context)
 	ApiCandleHandler(c Context)
+	ViewChart(c Context)
 }
 
 type bitflyerController struct {
@@ -80,4 +82,8 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 	//w.Header().Set("Content-Type", "application/json")
 	//w.Write(byte)
 	c.JSON(200, df)
+}
+
+func (b *bitflyerController) ViewChart(c Context) {
+	c.HTML(http.StatusOK, "google.html", "string")
 }
