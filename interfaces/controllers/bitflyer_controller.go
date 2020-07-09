@@ -51,7 +51,6 @@ func (b *bitflyerController) StreamIngestionData(c Context) {
 }
 
 func (b *bitflyerController) ApiCandleHandler(c Context) {
-	//productCode := r.URL.Query().Get("product_code")
 	productCode := c.Query("product_code")
 
 	if productCode == "" {
@@ -65,7 +64,6 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		limit = 1000
 	}
 
-	//duration := r.URL.Query().Get("duration")
 	duration := c.Query("duration")
 	if duration == "" {
 		duration = "1m"
@@ -74,13 +72,6 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 
 	df := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
 
-	//byte, err := json.Marshal(df)
-	//if err != nil {
-	//	// todo error
-	//	return
-	//}
-	//w.Header().Set("Content-Type", "application/json")
-	//w.Write(byte)
 	c.JSON(200, df)
 }
 
