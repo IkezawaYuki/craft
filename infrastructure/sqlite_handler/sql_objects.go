@@ -34,7 +34,7 @@ func (r sqlResult) RowsAffected() (int64, error) {
 }
 
 func (r sqlRow) Scan(dest ...interface{}) error {
-	return r.row.Scan()
+	return r.row.Scan(dest...)
 }
 
 func (r sqlRows) Next() bool {
@@ -42,7 +42,7 @@ func (r sqlRows) Next() bool {
 }
 
 func (r sqlRows) Scan(dest ...interface{}) error {
-	return r.rows.Scan(dest)
+	return r.rows.Scan(dest...)
 }
 
 func (r sqlRows) Close() error {

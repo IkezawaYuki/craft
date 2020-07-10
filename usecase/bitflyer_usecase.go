@@ -20,7 +20,7 @@ func NewBitFlyerUsecase(canRepo repository.CandleRepository) BitFlyerUsecase {
 
 type BitFlyerUsecase interface {
 	CreateCandleWithDuration(model.Ticker, string, time.Duration) bool
-	FindAllCandle(string, time.Duration, int) *model.DataFrameCandle
+	FindAllCandle(string, time.Duration, int) (*model.DataFrameCandle, error)
 }
 
 func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productCode string, duration time.Duration) bool {
@@ -49,12 +49,12 @@ func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productC
 	return true
 }
 
-func (u *bitflyerUsecase) FindAllCandle(productCode string, durationTime time.Duration, limit int) *model.DataFrameCandle {
+func (u *bitflyerUsecase) FindAllCandle(productCode string, durationTime time.Duration, limit int) (*model.DataFrameCandle, error) {
 	df, err := u.candleRepo.FindAllCandle(productCode, durationTime, limit)
 	if err != nil {
 		logger.Error(fmt.Sprintf("FindAllCandle(%v, %v, %d)",
 			config.ConfigList.ProductCode, durationTime, limit), err)
-		return nil
+		return nil, err
 	}
-	return df
+	return df, nil
 }

@@ -70,11 +70,18 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 	}
 	durationTime := config.ConfigList.Durations[duration]
 
-	df := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+	df, _ := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
 
 	c.JSON(200, df)
 }
 
 func (b *bitflyerController) ViewChart(c Context) {
-	c.HTML(http.StatusOK, "google.html", "string")
+	limit := 100
+	duration := "1m"
+	durationTime := config.ConfigList.Durations[duration]
+	df, err := b.bitlyerUsecase.FindAllCandle(config.ConfigList.ProductCode, durationTime, limit)
+	if err != nil {
+		logger.Error("FindAllCandle()", err)
+	}
+	c.HTML(http.StatusOK, "google.html", df)
 }
