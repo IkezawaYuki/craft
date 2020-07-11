@@ -83,5 +83,14 @@ func (b *bitflyerController) ViewChart(c Context) {
 	if err != nil {
 		logger.Error("FindAllCandle()", err)
 	}
-	c.HTML(http.StatusOK, "google.html", df)
+	if df == nil {
+		logger.Info("candle is empty")
+		return
+	}
+	fmt.Println(df)
+	for _, d := range df.Candles {
+		fmt.Println(d)
+	}
+	fmt.Println("google")
+	c.HTML(http.StatusOK, "google.html", df.Candles)
 }

@@ -70,7 +70,7 @@ func (c *candleRepository) FindAllCandle(productCode string, duration time.Durat
 	dfCandle.Duration = duration
 	for rows.Next() {
 		var candle entity.Candle
-		if err := rows.Scan(&candle.Time, &candle.Open, &candle.High, &candle.Low, &candle.Volume); err != nil {
+		if err := rows.Scan(&candle.Time, &candle.Open, &candle.Close, &candle.High, &candle.Low, &candle.Volume); err != nil {
 			logger.Error("FindAllCandle rows.Scan()", err)
 			return nil, err
 		}

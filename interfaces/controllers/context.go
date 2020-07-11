@@ -1,7 +1,5 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
-
 type Context interface {
 	Param(key string) string
 	Query(key string) string
@@ -10,5 +8,3 @@ type Context interface {
 	Status(int)
 	HTML(code int, name string, obj interface{})
 }
-
-var c gin.Context
