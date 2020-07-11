@@ -15,7 +15,7 @@ import (
 )
 
 type BitlyerController interface {
-	StreamIngestionData(c Context)
+	StreamIngestionData()
 	ApiCandleHandler(c Context)
 	ViewChart(c Context)
 }
@@ -35,12 +35,11 @@ func NewBitlyerController(sqlH datastore.SQLHandler) BitlyerController {
 	}
 }
 
-func (b *bitflyerController) StreamIngestionData(c Context) {
+func (b *bitflyerController) StreamIngestionData() {
 	var tickerChannel = make(chan model.Ticker)
 	go b.bitflyerClient.GetRealTimeTicker(config.ConfigList.ProductCode, tickerChannel)
 	for ticker := range tickerChannel {
 		logger.Info("StreamIngestionData", fmt.Sprintf("ticker: %v", ticker))
-		c.JSON(200, ticker)
 		for _, duration := range config.ConfigList.Durations {
 			isCreated := b.bitlyerUsecase.CreateCandleWithDuration(ticker, ticker.ProductCode, duration)
 			if isCreated && duration == config.ConfigList.TradeDuration {
@@ -54,7 +53,7 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 	productCode := c.Query("product_code")
 
 	if productCode == "" {
-		// todo error
+		c.JSON(400, "product code is empty")
 		return
 	}
 	//strLimit := r.URL.Query().Get("limit")
@@ -70,8 +69,11 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 	}
 	durationTime := config.ConfigList.Durations[duration]
 
-	df, _ := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
-
+	df, err := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
 	c.JSON(200, df)
 }
 
@@ -87,10 +89,5 @@ func (b *bitflyerController) ViewChart(c Context) {
 		logger.Info("candle is empty")
 		return
 	}
-	fmt.Println(df)
-	for _, d := range df.Candles {
-		fmt.Println(d)
-	}
-	fmt.Println("google")
 	c.HTML(http.StatusOK, "google.html", df.Candles)
 }

@@ -20,9 +20,12 @@ func Init() {
 
 	router.LoadHTMLGlob("infrastructure/views/*.html")
 
+	go bitflyerCtr.StreamIngestionData()
+
 	router.POST("/api/candle/", func(c *gin.Context) {
-		bitflyerCtr.StreamIngestionData(c)
+		bitflyerCtr.ApiCandleHandler(c)
 	})
+
 	router.GET("/chart", func(c *gin.Context) {
 		bitflyerCtr.ViewChart(c)
 	})
