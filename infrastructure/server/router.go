@@ -22,7 +22,7 @@ func Init() {
 
 	go bitflyerCtr.StreamIngestionData()
 
-	router.POST("/api/candle/", func(c *gin.Context) {
+	router.POST("/api/candles/", func(c *gin.Context) {
 		bitflyerCtr.ApiCandleHandler(c)
 	})
 
