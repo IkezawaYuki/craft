@@ -1,32 +1,18 @@
 package middlewares
 
 import (
-	"context"
-	"firebase.google.com/go/auth"
+	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"strings"
+	"google.golang.org/api/option"
+	"os"
 )
 
-func verifyFirebaseIDToken(ctx *gin.Context, auth *auth.Client) (*auth.Token, error) {
-	headerAuth := ctx.GetHeader("Authorization")
-	token := strings.Replace(headerAuth, "Bearer ", "", 1)
-	jwtToken, err := auth.VerifyIDToken(context.Background(), token)
-	return jwtToken, err
-}
-
-func FirebaseGuard() gin.HandlerFunc {
+func Firebase() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authClientGin, ok := c.Get("firebase")
-		if !ok {
+		opt := option.WithCredentialsFile(os.Getenv("KEY_JSON_PATH"))
+		config := &firebase.Config{
+			ProjectID: os.Getenv("PROJECT_ID"),
+		}
 
-		}
-		authClient := authClientGin.(*auth.Client)
-		jwtToken, err := verifyFirebaseIDToken(c, authClient)
-		if err != nil {
-			c.JSON(401, "not authentication")
-			return
-		}
-		c.Set("auth", jwtToken)
-		c.Next()
 	}
 }

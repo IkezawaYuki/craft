@@ -3,7 +3,9 @@ module IkezawaYuki/craft
 go 1.14
 
 require (
-	firebase.google.com/go v3.13.0+incompatible // indirect
+	cloud.google.com/go/firestore v1.2.0 // indirect
+	firebase.google.com/go v3.13.0+incompatible
+	github.com/gin-contrib/cors v1.3.1 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -16,7 +18,7 @@ require (
 	github.com/sarulabs/di v2.0.0+incompatible
 	github.com/sirupsen/logrus v1.6.0
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
-	google.golang.org/api v0.29.0 // indirect
+	google.golang.org/api v0.29.0
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
