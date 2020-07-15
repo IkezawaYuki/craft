@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
@@ -13,6 +14,12 @@ func Firebase() gin.HandlerFunc {
 		config := &firebase.Config{
 			ProjectID: os.Getenv("PROJECT_ID"),
 		}
-
+		app, err := firebase.NewApp(context.Background(), config, opt)
+		if err != nil {
+			panic(err)
+		}
+		auth, err := app.Auth(context.Background())
+		c.Set("firebase", auth)
+		c.Next()
 	}
 }
