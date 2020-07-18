@@ -56,7 +56,6 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		c.JSON(400, "product code is empty")
 		return
 	}
-	//strLimit := r.URL.Query().Get("limit")
 	strLimit := c.Query("limit")
 	limit, err := strconv.Atoi(strLimit)
 	if strLimit == "" || err != nil || limit < 0 || limit > 1000 {
@@ -68,8 +67,30 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		duration = "1m"
 	}
 	durationTime := config.ConfigList.Durations[duration]
-
 	df, err := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+
+	sma := c.Query("sma")
+	if sma != "" {
+		strSmaPeriod1 := c.Query("sma_period_1")
+		strSmaPeriod2 := c.Query("sma_period_2")
+		strSmaPeriod3 := c.Query("sma_period_3")
+		period1, err := strconv.Atoi(strSmaPeriod1)
+		if err != nil {
+			period1 = 7
+		}
+		period2, err := strconv.Atoi(strSmaPeriod2)
+		if err != nil {
+			period2 = 14
+		}
+		period3, err := strconv.Atoi(strSmaPeriod3)
+		if err != nil {
+			period3 = 50
+		}
+		df.AddSma(period1)
+		df.AddSma(period2)
+		df.AddSma(period3)
+	}
+
 	if err != nil {
 		c.JSON(500, err)
 		return
