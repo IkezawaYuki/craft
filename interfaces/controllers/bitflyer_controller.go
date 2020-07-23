@@ -68,6 +68,10 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 	}
 	durationTime := config.ConfigList.Durations[duration]
 	df, err := b.bitlyerUsecase.FindAllCandle(productCode, durationTime, limit)
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
 
 	sma := c.Query("sma")
 	if sma != "" {
@@ -91,10 +95,28 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		df.AddSma(period3)
 	}
 
-	if err != nil {
-		c.JSON(500, err)
-		return
+	ema := c.Query("ema")
+	if ema != "" {
+		strEmaPeriod1 := c.Query("ema_period_1")
+		strEmaPeriod2 := c.Query("ema_period_2")
+		strEmaPeriod3 := c.Query("ema_period_3")
+		period1, err := strconv.Atoi(strEmaPeriod1)
+		if err != nil {
+			period1 = 7
+		}
+		period2, err := strconv.Atoi(strEmaPeriod2)
+		if err != nil {
+			period2 = 14
+		}
+		period3, err := strconv.Atoi(strEmaPeriod3)
+		if err != nil {
+			period3 = 50
+		}
+		df.AddEma(period1)
+		df.AddEma(period2)
+		df.AddEma(period3)
 	}
+
 	c.JSON(200, df)
 }
 

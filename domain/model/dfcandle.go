@@ -10,8 +10,9 @@ type DataFrameCandle struct {
 	ProductCode string          `json:"product_code"`
 	Duration    time.Duration   `json:"duration"`
 	Candles     []entity.Candle `json:"candles"`
-	SmaList     []Sma           `json:"smas"`
-	EmaList     []Ema           `json:"emas"`
+	SmaList     []Sma           `json:"smas,omitempty"`
+	EmaList     []Ema           `json:"emas,omitempty"`
+	BBands      *BBands         `json:"bbands,omitempty"`
 }
 
 func (df *DataFrameCandle) Opens() []float64 {
