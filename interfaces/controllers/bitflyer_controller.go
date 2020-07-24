@@ -117,6 +117,21 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		df.AddEma(period3)
 	}
 
+	bbands := c.Query("bbands")
+	if bbands != "" {
+		strN := c.Query("bbandsN")
+		strK := c.Query("bbandsK")
+		n, err := strconv.Atoi(strN)
+		if strN == "" || err != nil || n < 0 {
+			n = 20
+		}
+		k, err := strconv.Atoi(strK)
+		if strK == "" || err != nil || k < 0 {
+			k = 2
+		}
+		df.AddBBands(n, float64(k))
+	}
+
 	c.JSON(200, df)
 }
 

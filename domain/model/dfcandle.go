@@ -76,3 +76,18 @@ func (df *DataFrameCandle) AddEma(period int) bool {
 	}
 	return false
 }
+
+func (df *DataFrameCandle) AddBBands(n int, k float64) bool {
+	if n <= len(df.Closes()) {
+		up, mid, down := talib.BBands(df.Closes(), n, k, k, 0)
+		df.BBands = &BBands{
+			N:    n,
+			K:    k,
+			Up:   up,
+			Mid:  mid,
+			Down: down,
+		}
+		return true
+	}
+	return false
+}
