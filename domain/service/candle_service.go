@@ -32,7 +32,21 @@ func min(x, y int) int {
 	}
 }
 
-func (s *candleService) IchimokuCloud(inReal []float64) ([]float64, []float64, []float64, []float64, []float64) {
+func IchimokuCloud(inReal []float64) ([]float64, []float64, []float64, []float64, []float64) {
 	length := len(inReal)
 	tenkan := make([]float64, min(9, length))
+	kijun := make([]float64, min(26, length))
+	senkouA := make([]float64, min(26, length))
+	senkouB := make([]float64, min(52, length))
+	chikou := make([]float64, min(26, length))
+	for i := range inReal {
+		if i >= 9 {
+			min, max := minMax(inReal[i-9:])
+			tenkan = append(tenkan, (min+max)/2)
+		}
+		if i >= 26 {
+			min, max := minMax(inReal[i-26 : i])
+
+		}
+	}
 }
