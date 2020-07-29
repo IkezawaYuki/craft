@@ -132,6 +132,11 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		df.AddBBands(n, float64(k))
 	}
 
+	ichimoku := c.Query("ichimoku")
+	if ichimoku != "" {
+		df.AddIchimoku()
+	}
+
 	c.JSON(200, df)
 }
 

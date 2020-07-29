@@ -2,6 +2,7 @@ package model
 
 import (
 	"IkezawaYuki/craft/domain/entity"
+	"IkezawaYuki/craft/domain/service"
 	"github.com/markcheno/go-talib"
 	"time"
 )
@@ -87,6 +88,22 @@ func (df *DataFrameCandle) AddBBands(n int, k float64) bool {
 			Up:   up,
 			Mid:  mid,
 			Down: down,
+		}
+		return true
+	}
+	return false
+}
+
+func (df *DataFrameCandle) AddIchimoku() bool {
+	tenkanN := 9
+	if len(df.Closes()) >= tenkanN {
+		tenkan, kijun, senkouA, senkouB, chikou := service.IchimokuCloud(df.Closes())
+		df.IchimokuCloud = &IchimokuCloud{
+			Tenkan:  tenkan,
+			Kijun:   kijun,
+			SenkouA: senkouA,
+			SenkouB: senkouB,
+			Chikou:  chikou,
 		}
 		return true
 	}
