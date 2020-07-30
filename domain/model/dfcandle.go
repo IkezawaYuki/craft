@@ -14,7 +14,8 @@ type DataFrameCandle struct {
 	SmaList       []Sma           `json:"smas,omitempty"`
 	EmaList       []Ema           `json:"emas,omitempty"`
 	BBands        *BBands         `json:"bbands,omitempty"`
-	IchimokuCloud *IchimokuCloud  `json:"ichimoku_cloud"`
+	IchimokuCloud *IchimokuCloud  `json:"ichimoku_cloud,omitempty"`
+	Rsi           *Rsi            `json:"rsi,omitempty"`
 }
 
 func (df *DataFrameCandle) Opens() []float64 {
@@ -104,6 +105,18 @@ func (df *DataFrameCandle) AddIchimoku() bool {
 			SenkouA: senkouA,
 			SenkouB: senkouB,
 			Chikou:  chikou,
+		}
+		return true
+	}
+	return false
+}
+
+func (df *DataFrameCandle) AddRsi(period int) bool {
+	if len(df.Candles) > period {
+		values := talib.Rsi(df.Closes(), period)
+		df.Rsi = &Rsi{
+			Period: period,
+			Values: values,
 		}
 		return true
 	}

@@ -137,6 +137,16 @@ func (b *bitflyerController) ApiCandleHandler(c Context) {
 		df.AddIchimoku()
 	}
 
+	rsi := c.Query("rsi")
+	if rsi == "" {
+		strPeriod := c.Query("rsiPeriod")
+		period, err := strconv.Atoi(strPeriod)
+		if strPeriod == "" || err != nil || period < 0 {
+			period = 14
+		}
+		df.AddRsi(period)
+	}
+
 	c.JSON(200, df)
 }
 
