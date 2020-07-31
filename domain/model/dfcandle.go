@@ -16,6 +16,7 @@ type DataFrameCandle struct {
 	BBands        *BBands         `json:"bbands,omitempty"`
 	IchimokuCloud *IchimokuCloud  `json:"ichimoku_cloud,omitempty"`
 	Rsi           *Rsi            `json:"rsi,omitempty"`
+	Macd          *Macd           `json:"macd"`
 }
 
 func (df *DataFrameCandle) Opens() []float64 {
