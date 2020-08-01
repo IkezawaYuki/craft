@@ -123,3 +123,19 @@ func (df *DataFrameCandle) AddRsi(period int) bool {
 	}
 	return false
 }
+
+func (df *DataFrameCandle) AddMacd(inFastPeriod, inSlowPeriod, inSignalPeriod int) bool {
+	if len(df.Candles) > 1 {
+		outMACD, outMACDSignal, outMACDHist := talib.Macd(df.Closes(), inFastPeriod, inSlowPeriod, inSignalPeriod)
+		df.Macd = &Macd{
+			FastPeriod:   inFastPeriod,
+			SlowPeriod:   inSlowPeriod,
+			SignalPeriod: inSignalPeriod,
+			Macd:         outMACD,
+			MacdSignal:   outMACDSignal,
+			MacdHist:     outMACDHist,
+		}
+		return true
+	}
+	return false
+}
