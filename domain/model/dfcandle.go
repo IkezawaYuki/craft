@@ -17,7 +17,7 @@ type DataFrameCandle struct {
 	IchimokuCloud *IchimokuCloud  `json:"ichimoku_cloud,omitempty"`
 	Rsi           *Rsi            `json:"rsi,omitempty"`
 	Macd          *Macd           `json:"macd"`
-	Hv            *Hv             `json:"hv"`
+	Hvs           []Hv            `json:"hv"`
 }
 
 func (df *DataFrameCandle) Opens() []float64 {
@@ -143,6 +143,9 @@ func (df *DataFrameCandle) AddMacd(inFastPeriod, inSlowPeriod, inSignalPeriod in
 
 func (df *DataFrameCandle) AddHv(period int) bool {
 	if len(df.Candles) >= period {
-
+		df.Hvs = append(df.Hvs, Hv{
+			Period: ,
+			Values: ,
+		})
 	}
 }
