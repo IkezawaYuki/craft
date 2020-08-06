@@ -144,8 +144,10 @@ func (df *DataFrameCandle) AddMacd(inFastPeriod, inSlowPeriod, inSignalPeriod in
 func (df *DataFrameCandle) AddHv(period int) bool {
 	if len(df.Candles) >= period {
 		df.Hvs = append(df.Hvs, Hv{
-			Period: ,
-			Values: ,
+			Period: period,
+			Values: service.Hv(df.Closes(), period),
 		})
+		return true
 	}
+	return false
 }
