@@ -13,7 +13,7 @@ import (
 var db *sql.DB
 
 const (
-	tableNameSignalEvents = "signal_events"
+	TableNameSignalEvents = "signal_events"
 )
 
 func GetCandleTableName(productCode string, duration time.Duration) string {
@@ -40,7 +40,7 @@ func Connect() *sql.DB {
 			product_code STRING,
 			side STRING,
 			price FLOAT,
-			size FLOAT)`, tableNameSignalEvents)
+			size FLOAT)`, TableNameSignalEvents)
 	_, err = db.Exec(cmd)
 	if err != nil {
 		panic(err)
