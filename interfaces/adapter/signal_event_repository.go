@@ -32,3 +32,7 @@ func (r *eventsRepository) Save(events *entity.SignalEvent) bool {
 	}
 	return true
 }
+
+func (r *eventsRepository) GetByCount(loadEvents int) *entity.SignalEvents {
+	panic("implement me")
+}
