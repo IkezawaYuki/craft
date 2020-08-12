@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"IkezawaYuki/craft/config"
 	"IkezawaYuki/craft/domain/entity"
 	"IkezawaYuki/craft/domain/repository"
 	sqlitehandler "IkezawaYuki/craft/infrastructure/sqlite_handler"
@@ -33,6 +34,27 @@ func (r *eventsRepository) Save(events *entity.SignalEvent) bool {
 	return true
 }
 
+const selectSignalStmt = `SELECT * FROM (
+	SELECT time, product_code, side, price, size FROM %s WHERE product_code = ? ORDER BY time DESC LIMIT ?)
+	ORDER BY time ASC;
+`
+
 func (r *eventsRepository) GetByCount(loadEvents int) *entity.SignalEvents {
-	panic("implement me")
+	cmd := fmt.Sprintf(selectSignalStmt, sqlitehandler.TableNameSignalEvents)
+	rows, err := r.sqlHandler.Query(cmd, config.ConfigList.ProductCode, loadEvents)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var signalEvents entity.SignalEvents
+	for rows.Next() {
+		var signalEvent entity.SignalEvent
+		if err := rows.Scan(
+			&signalEvent.Time,
+		// todo
+		); err != nil {
+			return nil
+		}
+	}
 }
