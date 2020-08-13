@@ -9,6 +9,7 @@ import (
 	"IkezawaYuki/craft/logger"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type eventsRepository struct {
@@ -52,9 +53,40 @@ func (r *eventsRepository) GetByCount(loadEvents int) *entity.SignalEvents {
 		var signalEvent entity.SignalEvent
 		if err := rows.Scan(
 			&signalEvent.Time,
-		// todo
+			&signalEvent.ProductCode,
+			&signalEvent.Side,
+			&signalEvent.Price,
+			&signalEvent.Size,
 		); err != nil {
 			return nil
 		}
+		signalEvents.Signals = append(signalEvents.Signals, signalEvent)
 	}
+	return &signalEvents
+}
+
+const selectSignalEventAfterTimeQuery = `SELECT * FROM (
+	SELECT time, product_code, side, price, size FROM %s
+	WHERE DATETIME(time) >= DATETIME(?)
+	ORDER BY time DESC
+	) ORDER BY time ASC;`
+
+func (r *eventsRepository) GetSignalEventsAfterTime(timeTime time.Time) *entity.SignalEvents {
+	cmd := fmt.Sprintf(selectSignalEventAfterTimeQuery, sqlitehandler.TableNameSignalEvents)
+	rows, err := r.sqlHandler.Query(cmd, timeTime.Format(time.RFC3339))
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var signalEvents entity.SignalEvents
+	for rows.Next() {
+		var signalEvent entity.SignalEvent
+		if err := rows.Scan(&signalEvent.Time, &signalEvent.ProductCode, &signalEvent.Side,
+			&signalEvent.Price, &signalEvent.Size); err != nil {
+			return nil
+		}
+		signalEvents.Signals = append(signalEvents.Signals, signalEvent)
+	}
+	return &signalEvents
 }
