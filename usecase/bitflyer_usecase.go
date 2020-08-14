@@ -49,6 +49,7 @@ func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productC
 	return true
 }
 
+// FindAllCandle is ...
 func (u *bitflyerUsecase) FindAllCandle(productCode string, durationTime time.Duration, limit int) (*model.DataFrameCandle, error) {
 	df, err := u.candleRepo.FindAllCandle(productCode, durationTime, limit)
 	if err != nil {

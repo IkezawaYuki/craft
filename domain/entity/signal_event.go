@@ -20,3 +20,16 @@ type SignalEvents struct {
 func NewSignalEvents() *SignalEvents {
 	return &SignalEvents{}
 }
+
+func (s *SignalEvents) CanBuy(time time.Time) bool {
+	lenSignals := len(s.Signals)
+	if lenSignals == 0 {
+		return false
+	}
+
+	lastSignal := s.Signals[lenSignals-1]
+	if lastSignal.Side == "BUY" && lastSignal.Time.Before(time) {
+		return true
+	}
+	return false
+}
