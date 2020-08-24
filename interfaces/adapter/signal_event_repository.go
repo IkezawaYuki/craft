@@ -90,3 +90,11 @@ func (r *eventsRepository) GetSignalEventsAfterTime(timeTime time.Time) *entity.
 	}
 	return &signalEvents
 }
+
+func (r *eventsRepository) Buy(productCode string, time time.Time, price, size float64, save bool) bool {
+
+}
+
+func (r *eventsRepository) Sell(productCode string, time time.Time, price, size float64, save bool) bool {
+
+}
