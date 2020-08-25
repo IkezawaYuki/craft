@@ -92,9 +92,9 @@ func (r *eventsRepository) GetSignalEventsAfterTime(timeTime time.Time) *entity.
 }
 
 func (r *eventsRepository) Buy(productCode string, time time.Time, price, size float64, save bool) bool {
-
+	panic("implement me")
 }
 
 func (r *eventsRepository) Sell(productCode string, time time.Time, price, size float64, save bool) bool {
-
+	panic("implement me")
 }

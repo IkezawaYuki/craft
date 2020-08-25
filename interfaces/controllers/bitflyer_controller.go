@@ -26,9 +26,10 @@ type bitflyerController struct {
 }
 
 func NewBitlyerController(sqlH datastore.SQLHandler) BitlyerController {
-	bitRepo := adapter.NewCandleRepository(sqlH)
+	canRepo := adapter.NewCandleRepository(sqlH)
+	eveRepo := adapter.NewEventsRepository(sqlH)
 	apiClient := bitflyer.NewApiClient(config.ConfigList.APIKey, config.ConfigList.APISecret)
-	bitUsecase := usecase.NewBitFlyerUsecase(bitRepo)
+	bitUsecase := usecase.NewBitFlyerUsecase(canRepo, eveRepo)
 	return &bitflyerController{
 		bitlyerUsecase: bitUsecase,
 		bitflyerClient: apiClient,

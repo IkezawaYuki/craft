@@ -12,15 +12,21 @@ import (
 
 type bitflyerUsecase struct {
 	candleRepo repository.CandleRepository
+	eventRepo  repository.SignalEventRepository
 }
 
-func NewBitFlyerUsecase(canRepo repository.CandleRepository) BitFlyerUsecase {
-	return &bitflyerUsecase{candleRepo: canRepo}
+func NewBitFlyerUsecase(canRepo repository.CandleRepository, eveRepo repository.SignalEventRepository) BitFlyerUsecase {
+	return &bitflyerUsecase{
+		candleRepo: canRepo,
+		eventRepo:  eveRepo,
+	}
 }
 
 type BitFlyerUsecase interface {
 	CreateCandleWithDuration(model.Ticker, string, time.Duration) bool
 	FindAllCandle(string, time.Duration, int) (*model.DataFrameCandle, error)
+	Buy(productCode string, time time.Time, price, size float64, save bool) (*entity.SignalEvent, bool)
+	Sell(productCode string, time time.Time, price, size float64, save bool) (*entity.SignalEvent, bool)
 }
 
 func (u *bitflyerUsecase) CreateCandleWithDuration(ticker model.Ticker, productCode string, duration time.Duration) bool {
@@ -58,4 +64,48 @@ func (u *bitflyerUsecase) FindAllCandle(productCode string, durationTime time.Du
 		return nil, err
 	}
 	return df, nil
+}
+
+// Buy is ...
+func (u *bitflyerUsecase) Buy(productCode string, time time.Time, price, size float64, save bool,
+) (*entity.SignalEvent, bool) {
+	s := entity.NewSignalEvents()
+	if s.CanBuy(time) {
+		return nil, false
+	}
+
+	signalEvent := entity.SignalEvent{
+		Time:        time,
+		ProductCode: productCode,
+		Side:        "BUY",
+		Price:       price,
+		Size:        size,
+	}
+
+	if save {
+		u.eventRepo.Save(&signalEvent)
+	}
+	return &signalEvent, true
+}
+
+// Sell is ...
+func (u *bitflyerUsecase) Sell(productCode string, time time.Time, price, size float64, save bool,
+) (*entity.SignalEvent, bool) {
+	s := entity.NewSignalEvents()
+	if s.CanBuy(time) {
+		return nil, false
+	}
+
+	signalEvent := entity.SignalEvent{
+		Time:        time,
+		ProductCode: productCode,
+		Side:        "SELL",
+		Price:       price,
+		Size:        size,
+	}
+
+	if save {
+		u.eventRepo.Save(&signalEvent)
+	}
+	return &signalEvent, true
 }
